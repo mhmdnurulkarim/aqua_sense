@@ -1,0 +1,47 @@
+name: aini_s_application1
+description: A new Flutter project.
+version: 1.0.0+1
+environment: 
+  sdk: '>=2.12.0 <3.0.0'
+dependencies: 
+  flutter: 
+    sdk: flutter
+  flutter_localizations: 
+    sdk: flutter
+  cached_network_image: ^3.3.0
+  flutter_svg: ^2.0.9
+  calendar_date_picker2: ^0.5.3
+  intl: ^0.18.0
+  connectivity_plus: ^5.0.2
+  fl_chart: ^0.67.0
+  firebase_core: ^2.30.1
+  firebase_auth: ^4.19.4
+  cloud_firestore: ^4.17.2
+  firebase_messaging: ^14.9.4
+  awesome_notifications: ^0.8.2
+  flutter_launcher_icons: ^0.13.1
+dev_dependencies: 
+  flutter_test: 
+    sdk: flutter
+flutter: 
+  uses-material-design: true
+  assets: 
+    - assets/
+    - assets/images/
+  fonts: 
+    - family: Itim
+      fonts: 
+        - asset: assets/fonts/ItimRegular.ttf
+          weight: 400
+    - family: Inder
+      fonts: 
+        - asset: assets/fonts/InderRegular.ttf
+          weight: 400
+    - family: Inter
+      fonts: 
+        - asset: assets/fonts/InterRegular.ttf
+          weight: 400
+    - family: Jua
+      fonts: 
+        - asset: assets/fonts/JuaRegular.ttf
+          weight: 400

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "854903352082",
+    "firebase_url": "https://tugasakhir-c7b7b-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "tugasakhir-c7b7b",
+    "storage_bucket": "tugasakhir-c7b7b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854903352082:android:2abe763581b19c1223e1cb",
+        "android_client_info": {
+          "package_name": "com.ainisapplication.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgia8IgdHQQfTFg-yCDTE4rCw5JXw1ko0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
