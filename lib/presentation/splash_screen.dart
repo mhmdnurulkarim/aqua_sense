@@ -1,10 +1,9 @@
-import 'package:aini_s_application1/presentation/tampilan_today_screen/tampilan_today_screen.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
 
-class TampilanAwalScreen extends StatelessWidget {
-  const TampilanAwalScreen({Key? key})
+import '../core/app_export.dart';
+
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({Key? key})
       : super(
           key: key,
         );
@@ -15,7 +14,8 @@ class TampilanAwalScreen extends StatelessWidget {
         Duration(seconds: 3),
         () => Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: AppRoutes.routes["/tampilan_today_screen"]!),
+              MaterialPageRoute(
+                  builder: AppRoutes.routes["/tampilan_today_screen"]!),
             ));
 
     return SafeArea(
@@ -26,10 +26,7 @@ class TampilanAwalScreen extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 26.h),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: 16.v),
-              _buildKarambawaColumn(context)
-            ],
+            children: [SizedBox(height: 16.v), _buildKarambawaColumn(context)],
           ),
         ),
       ),

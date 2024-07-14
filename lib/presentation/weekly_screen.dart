@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 class BarChartSample2 extends StatelessWidget {
   final List<DailyData> dailyData;
@@ -118,7 +116,7 @@ class BarChartSample2 extends StatelessWidget {
   }
 
   Widget bottomTitles(double value, TitleMeta meta) {
-    final titles = <String>['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+    final titles = <String>['1', '2', '3', '4', '5', '6', '7'];
 
     final Widget text = Text(
       titles[value.toInt()],
@@ -142,7 +140,9 @@ class WeeklyData {
   final double phAverage;
 
   WeeklyData(this.doAverage, this.phAverage);
-  String get doAverageFormatted => doAverage.toStringAsFixed(2); // 2 adalah jumlah tempat desimal
+
+  String get doAverageFormatted =>
+      doAverage.toStringAsFixed(2); // 2 adalah jumlah tempat desimal
   String get phAverageFormatted => phAverage.toStringAsFixed(2);
 }
 
@@ -197,8 +197,10 @@ class DataService {
       }
 
       if (dailyDoAverages.isNotEmpty && dailyPhAverages.isNotEmpty) {
-        double weeklyDoAverage = dailyDoAverages.reduce((a, b) => a + b) / dailyDoAverages.length;
-        double weeklyPhAverage = dailyPhAverages.reduce((a, b) => a + b) / dailyPhAverages.length;
+        double weeklyDoAverage =
+            dailyDoAverages.reduce((a, b) => a + b) / dailyDoAverages.length;
+        double weeklyPhAverage =
+            dailyPhAverages.reduce((a, b) => a + b) / dailyPhAverages.length;
         weeklyData.add(WeeklyData(weeklyDoAverage, weeklyPhAverage));
       }
     }
@@ -210,7 +212,8 @@ class DataService {
     DateTime now = DateTime.now();
     int currentMonth = now.month;
     DateTime firstDayOfMonth = DateTime(now.year, currentMonth, 1);
-    DateTime startOfWeek = firstDayOfMonth.add(Duration(days: (weekNumber - 1) * 7));
+    DateTime startOfWeek =
+        firstDayOfMonth.add(Duration(days: (weekNumber - 1) * 7));
 
     for (int day = 0; day < 7; day++) {
       DateTime currentDate = startOfWeek.add(Duration(days: day));
@@ -234,7 +237,8 @@ class DataService {
           dailyPhSum += doc['pH'];
         });
 
-        dailyData.add(DailyData(dailyDoSum / dataCount, dailyPhSum / dataCount));
+        dailyData
+            .add(DailyData(dailyDoSum / dataCount, dailyPhSum / dataCount));
       } else {
         dailyData.add(DailyData(0, 0));
       }
@@ -265,21 +269,22 @@ class DataService {
   }
 }
 
-class TampilanWeeklyScreen extends StatefulWidget {
+class WeeklyScreen extends StatefulWidget {
   @override
-  _TampilanWeeklyScreenState createState() => _TampilanWeeklyScreenState();
+  _WeeklyScreenState createState() => _WeeklyScreenState();
 }
 
-class _TampilanWeeklyScreenState extends State<TampilanWeeklyScreen> {
+class _WeeklyScreenState extends State<WeeklyScreen> {
   final DataService _dataService = DataService();
   final List<DateTime?> selectedDatesFromCalendar = [];
-  final TextEditingController vectornineteenController = TextEditingController();
+  final TextEditingController vectornineteenController =
+      TextEditingController();
   final TextEditingController vectorController = TextEditingController();
   final TextEditingController vector1Controller = TextEditingController();
   List<WeeklyData> _weeklyData = [];
   List<DailyData>? _dailyData;
   int _selectedWeek = -1;
-  int _activeButtonIndex = -1; 
+  int _activeButtonIndex = -1;
 
   @override
   void initState() {
@@ -309,12 +314,20 @@ class _TampilanWeeklyScreenState extends State<TampilanWeeklyScreen> {
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.indigo,
-          title: Text('Data for Week $weekNumber',),
-          content: Text('DO Average: ${data.doAverageFormatted}\nPH Average: ${data.phAverageFormatted}',style: TextStyle(color: Colors.white),),
+          title: Text(
+            'Data for Week $weekNumber',
+          ),
+          content: Text(
+            'DO Average: ${data.doAverageFormatted}\nPH Average: ${data.phAverageFormatted}',
+            style: TextStyle(color: Colors.white),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK',style: TextStyle(color: Colors.white),),
+              child: Text(
+                'OK',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -335,11 +348,12 @@ class _TampilanWeeklyScreenState extends State<TampilanWeeklyScreen> {
         resizeToAvoidBottomInset: false,
         body: Column(
           children: [
-            Align(alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('Average Mingguan'),
-              )),
+            Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('Rata-rata Mingguan'),
+                )),
             FutureBuilder<List<WeeklyData>>(
               future: _dataService.getWeeklyData(),
               builder: (context, snapshot) {
@@ -348,11 +362,11 @@ class _TampilanWeeklyScreenState extends State<TampilanWeeklyScreen> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No data available'));
+                  return Center(child: Text('Tidak ada data tersedia'));
                 }
 
                 final weeklyData = snapshot.data!;
-                
+
                 return SizedBox(
                   width: double.maxFinite,
                   child: SingleChildScrollView(
@@ -366,118 +380,139 @@ class _TampilanWeeklyScreenState extends State<TampilanWeeklyScreen> {
                                 padding: EdgeInsets.all(10),
                                 child: ElevatedButton(
                                   onPressed: () => _showDataForWeek(context, i),
-                                  child:   Text('Minggu $i',
-                                    style: TextStyle(
-                                      color: Colors.white
-                                    ),),
+                                  child: Text(
+                                    'Minggu $i',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                   style: ButtonStyle(
-                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                    shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
                                       RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8.0),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
                                       ),
                                     ),
-                                    padding: MaterialStateProperty.all(EdgeInsets.only(bottom: 5, left: 8, right: 8)),
-                                    backgroundColor: MaterialStateProperty.all<Color>(Colors.blueGrey),
+                                    padding: MaterialStateProperty.all(
+                                        EdgeInsets.only(
+                                            bottom: 5, left: 8, right: 8)),
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.blueGrey),
                                   ),
                                 ),
                               ),
                           ],
                         ),
-                    
                       ],
                     ),
                   ),
                 );
               },
             ),
-            SizedBox(height: 15,),
-            Align(alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('Average Harian'),
-              )),
-              SizedBox(height: 20,),
-               Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Row(
-                    children: [
-                      Container(
-                      padding: EdgeInsets.all(3),
-                      decoration: BoxDecoration(
+            SizedBox(
+              height: 15,
+            ),
+            Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('Rata-rata Harian'),
+                )),
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(3),
+                    decoration: BoxDecoration(
                       color: Colors.amber,
-                      borderRadius: BorderRadius.circular(3), ),
-                      child: Row(
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('DO')
-                      ],
-                        ),
-                      ),
-                      SizedBox(width: 10,),
-                      Container(
-                      padding: EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                      color: Colors.indigo,
-                      borderRadius: BorderRadius.circular(3), ),
-                      child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('pH', style: TextStyle(color: Colors.white),)
-                      ],
-                        ),
-                      ),
-                    ],
+                      children: [Text('DO')],
+                    ),
                   ),
-                ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: Colors.indigo,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'pH',
+                          style: TextStyle(color: Colors.white),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: _dailyData != null
                   ? BarChartSample2(dailyData: _dailyData!)
-                  : Center(child: Text('Pilih minggu untuk melihat detail harian')),
+                  : Center(
+                      child: Text('Pilih minggu untuk melihat detail harian')),
             ),
-              Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Text('Hari perminggu'),
-                ),
-             Container(
-                  decoration: BoxDecoration(color: Colors.amber),
-                ),
-                SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      for (int i = 1; i <= 4; i++)
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          child: ElevatedButton(
-                            onPressed: () {
-                                    _fetchDailyData(i);
-                                    setState(() {
-                                      _activeButtonIndex = i; // Set tombol yang aktif
-                                    });
-                                  },
-                            
-                            child: 
-                            Text('Minggu $i',
-                            style: TextStyle(
-                              color: _activeButtonIndex == i ? Colors.teal : Colors.white, 
-                            ),),
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ),
-                              ),
-                              padding: MaterialStateProperty.all(EdgeInsets.only(bottom: 5, left: 8, right: 8)),
-                              backgroundColor: MaterialStateProperty.all<Color>( _activeButtonIndex == i ? Colors.white : Colors.teal,),
-                            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: Text('Hari perminggu'),
+            ),
+            Container(
+              decoration: BoxDecoration(color: Colors.amber),
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (int i = 1; i <= 4; i++)
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _fetchDailyData(i);
+                          setState(() {
+                            _activeButtonIndex = i; // Set tombol yang aktif
+                          });
+                        },
+                        child: Text(
+                          'Minggu $i',
+                          style: TextStyle(
+                            color: _activeButtonIndex == i
+                                ? Colors.teal
+                                : Colors.white,
                           ),
                         ),
-                        
-                    ],
-                    
-                  ),
-                ),
-               
+                        style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                          ),
+                          padding: MaterialStateProperty.all(
+                              EdgeInsets.only(bottom: 5, left: 8, right: 8)),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                            _activeButtonIndex == i
+                                ? Colors.white
+                                : Colors.teal,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

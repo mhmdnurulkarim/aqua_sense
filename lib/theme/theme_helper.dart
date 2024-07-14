@@ -1,9 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+
 import '../core/app_export.dart';
 
 String _appTheme = "lightCode";
+
 LightCodeColors get appTheme => ThemeHelper().themeColor();
+
 ThemeData get theme => ThemeHelper().themeData();
 
 /// Helper class for managing themes and colors.
@@ -16,7 +18,7 @@ class ThemeHelper {
     'lightCode': LightCodeColors()
   };
 
-// A map of color schemes supported by the app
+  // A map of color schemes supported by the app
   Map<String, ColorScheme> _supportedColorScheme = {
     'lightCode': ColorSchemes.lightCodeColorScheme
   };
@@ -100,19 +102,28 @@ class ColorSchemes {
 class LightCodeColors {
   // Black
   Color get black900 => Color(0XFF000000);
-// Blue
+
+  // Blue
   Color get blue200 => Color(0XFF97CADB);
-// BlueGray
+
+  // BlueGray
   Color get blueGray100 => Color(0XFFCCCCCC);
+
   Color get blueGray300 => Color(0XFF79A0BC);
+
   Color get blueGray400 => Color(0XFF888888);
+
   Color get blueGray900 => Color(0XFF001B48);
-// Gray
+
+  // Gray
   Color get gray400 => Color(0XFFC2C2C2);
-// Red
+
+  // Red
   Color get red800 => Color(0XFFD81E1E);
-// Teal
+
+  // Teal
   Color get teal50 => Color(0XFFD6E7EE);
-// White
+
+  // White
   Color get whiteA700 => Color(0XFFFFFFFF);
 }

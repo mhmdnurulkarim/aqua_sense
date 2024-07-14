@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../core/app_export.dart';
 
 class CustomTextFormField extends StatelessWidget {
@@ -107,6 +108,7 @@ class CustomTextFormField extends StatelessWidget {
           validator: validator,
         ),
       );
+
   InputDecoration get decoration => InputDecoration(
         hintText: hintText ?? "",
         hintStyle: hintStyle,

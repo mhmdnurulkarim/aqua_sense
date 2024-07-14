@@ -3,10 +3,10 @@ class ImageConstant {
   // Image folder path
   static String imagePath = 'assets/images';
 
-// Alarm images
+  // Alarm images
   static String imgVector = '$imagePath/img_vector.svg';
 
-// Common images
+  // Common images
   static String imgGroup = '$imagePath/img_group.svg';
 
   static String imgGroupGray400 = '$imagePath/img_group_gray_400.svg';

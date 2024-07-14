@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../core/app_export.dart';
 
 class AppDecoration {
@@ -6,17 +7,22 @@ class AppDecoration {
   static BoxDecoration get fillBlue => BoxDecoration(
         color: appTheme.blue200,
       );
+
   static BoxDecoration get fillBlueGray => BoxDecoration(
         color: appTheme.blueGray300,
       );
+
   static BoxDecoration get fillTeal => BoxDecoration(
         color: appTheme.teal50,
       );
+
   static BoxDecoration get fillWhiteA => BoxDecoration(
         color: appTheme.whiteA700,
       );
+
 // Outline decorations
   static BoxDecoration get outlineBlack => BoxDecoration();
+
   static BoxDecoration get outlineBlack900 => BoxDecoration(
         color: appTheme.blueGray300,
         boxShadow: [
@@ -38,9 +44,11 @@ class BorderRadiusStyle {
   static BorderRadius get roundedBorder10 => BorderRadius.circular(
         10.h,
       );
+
   static BorderRadius get roundedBorder20 => BorderRadius.circular(
         20.h,
       );
+
   static BorderRadius get roundedBorder30 => BorderRadius.circular(
         30.h,
       );

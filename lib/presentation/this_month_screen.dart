@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
-import '../../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
+
+import '../core/app_export.dart';
+import '../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
 
 // ignore_for_file: must_be_immutable
-class TampilanThisMonthScreen extends StatelessWidget {
-  TampilanThisMonthScreen({Key? key})
+class ThisMonthScreen extends StatelessWidget {
+  ThisMonthScreen({Key? key})
       : super(
           key: key,
         );

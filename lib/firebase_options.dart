@@ -46,7 +46,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '854903352082',
     projectId: 'tugasakhir-c7b7b',
     authDomain: 'tugasakhir-c7b7b.firebaseapp.com',
-    databaseURL: 'https://tugasakhir-c7b7b-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://tugasakhir-c7b7b-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'tugasakhir-c7b7b.appspot.com',
     measurementId: 'G-6ZM4MFHYBM',
   );
@@ -56,7 +57,8 @@ class DefaultFirebaseOptions {
     appId: '1:854903352082:android:2abe763581b19c1223e1cb',
     messagingSenderId: '854903352082',
     projectId: 'tugasakhir-c7b7b',
-    databaseURL: 'https://tugasakhir-c7b7b-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://tugasakhir-c7b7b-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'tugasakhir-c7b7b.appspot.com',
   );
 
@@ -65,7 +67,8 @@ class DefaultFirebaseOptions {
     appId: '1:854903352082:ios:82d7d119a80aa76a23e1cb',
     messagingSenderId: '854903352082',
     projectId: 'tugasakhir-c7b7b',
-    databaseURL: 'https://tugasakhir-c7b7b-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://tugasakhir-c7b7b-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'tugasakhir-c7b7b.appspot.com',
     iosBundleId: 'com.ainisapplication.app.testProject',
   );
@@ -75,7 +78,8 @@ class DefaultFirebaseOptions {
     appId: '1:854903352082:ios:74f93370c48e2b9623e1cb',
     messagingSenderId: '854903352082',
     projectId: 'tugasakhir-c7b7b',
-    databaseURL: 'https://tugasakhir-c7b7b-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://tugasakhir-c7b7b-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'tugasakhir-c7b7b.appspot.com',
     iosBundleId: 'com.example.app2',
   );
@@ -86,7 +90,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '854903352082',
     projectId: 'tugasakhir-c7b7b',
     authDomain: 'tugasakhir-c7b7b.firebaseapp.com',
-    databaseURL: 'https://tugasakhir-c7b7b-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://tugasakhir-c7b7b-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'tugasakhir-c7b7b.appspot.com',
     measurementId: 'G-0WJ725ESLM',
   );

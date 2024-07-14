@@ -8,10 +8,14 @@ const num FIGMA_DESIGN_STATUS_BAR = 0;
 
 extension ResponsiveExtension on num {
   double get _width => SizeUtils.width;
+
   double get _height => SizeUtils.height;
+
   double get h => ((this * _width) / FIGMA_DESIGN_WIDTH);
+
   double get v =>
       (this * _height) / (FIGMA_DESIGN_HEIGHT - FIGMA_DESIGN_STATUS_BAR);
+
   double get adaptSize {
     var height = v;
     var width = h;
@@ -52,6 +56,7 @@ class Sizer extends StatelessWidget {
     });
   }
 }
+
 class SizeUtils {
   /// Device's BoxConstraints
   static late BoxConstraints boxConstraints;
