@@ -1,35 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:karamba_warning/widgets/widget_utils.dart';
 
-String getDayOfWeek(int weekday) {
-  switch (weekday) {
-    case 1:
-      return 'senin';
-    case 2:
-      return 'selasa';
-    case 3:
-      return 'rabu';
-    case 4:
-      return 'kamis';
-    case 5:
-      return 'jumat';
-    case 6:
-      return 'sabtu';
-    case 7:
-      return 'minggu';
-    default:
-      return 'minggu';
-  }
-}
-
-class ChartKaramba extends StatefulWidget {
+class TodayChart extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => ChartKarambaState();
+  State<StatefulWidget> createState() => TodayChartState();
 }
 
-class ChartKarambaState extends State<ChartKaramba> {
-  final double width = 7;
+class TodayChartState extends State<TodayChart> {
   late List<BarChartGroupData> showingBarGroups;
   int touchedGroupIndex = -1;
   List<String> titlesList = [];
@@ -39,33 +18,23 @@ class ChartKarambaState extends State<ChartKaramba> {
     super.initState();
     // Initialize showingBarGroups with an empty list
     showingBarGroups = [];
+
     // Fetch data from Firebase and populate showingBarGroups
-    fetchFirebaseData();
+    firebaseData();
   }
 
-  void fetchFirebaseData() async {
-    var currentDate = DateTime.now();
-    var currentDateFormatted =
-        "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
-    String dayOfWeek = getDayOfWeek(currentDate.weekday);
-
+  void firebaseData() async {
     // Fetch data from Firebase
     // var querySnapshot = await FirebaseFirestore.instance
     //     .collection('history')
     //     .doc(currentDateFormatted)
-    //     .collection('dataJam')
-    //     .get();
-
-    // var querySnapshot = await FirebaseFirestore.instance
-    //     .collection('history')
-    //     .doc('2024-07-07')
-    //     .collection('dataJam')
+    //     .collection(dayOfWeek)
     //     .get();
 
     var querySnapshot = await FirebaseFirestore.instance
         .collection('history')
-        .doc(currentDateFormatted)
-        .collection(dayOfWeek)
+        .doc("2024-05-08")
+        .collection("rabu")
         .get();
 
     // Process fetched data
@@ -105,7 +74,6 @@ class ChartKarambaState extends State<ChartKaramba> {
               child: BarChart(
                 BarChartData(
                   maxY: 20,
-                  // Adjust max value as needed
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
                       getTooltipColor: ((group) {
@@ -113,9 +81,7 @@ class ChartKarambaState extends State<ChartKaramba> {
                       }),
                       getTooltipItem: (a, b, c, d) => null,
                     ),
-                    touchCallback: (FlTouchEvent event, response) {
-                      // Your touch callback logic here
-                    },
+                    touchCallback: (FlTouchEvent event, response) {},
                   ),
                   titlesData: FlTitlesData(
                     show: true,
@@ -158,51 +124,7 @@ class ChartKarambaState extends State<ChartKaramba> {
     );
   }
 
-  Widget leftTitles(double value, TitleMeta meta) {
-    if (value % 2 == 0 && value <= 20) {
-      return SideTitleWidget(
-        axisSide: meta.axisSide,
-        space: 0,
-        child: Text(
-          value.toInt().toString(),
-          style: const TextStyle(
-            color: Color(0xff7589a2),
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-        ),
-      );
-    } else {
-      return Container();
-    }
-  }
-
   Widget bottomTitles(double value, TitleMeta meta) {
-    // final titles = <String>[
-    //   '18.00',
-    //   '19.00',
-    //   '20.00',
-    //   '21.00',
-    //   '22.00',
-    //   '23.00',
-    //   '00.00',
-    //   '01:00',
-    //   '02.00',
-    //   '03.00',
-    //   '04.00',
-    //   '05.00',
-    //   '06.00',
-    // ];
-    //
-    // final Widget text = Text(
-    //   titles[value.toInt()],
-    //   style: const TextStyle(
-    //     color: Color(0xff7589a2),
-    //     fontWeight: FontWeight.bold,
-    //     fontSize: 14,
-    //   ),
-    // );
-
     final index = value.toInt();
     if (index < 0 || index >= titlesList.length) {
       return Container();
@@ -221,25 +143,6 @@ class ChartKarambaState extends State<ChartKaramba> {
       axisSide: meta.axisSide,
       space: 16, //margin top
       child: text,
-    );
-  }
-
-  BarChartGroupData makeGroupData(int x, double y1, double y2) {
-    return BarChartGroupData(
-      barsSpace: 4,
-      x: x,
-      barRods: [
-        BarChartRodData(
-          toY: y1,
-          color: Colors.amber,
-          width: width,
-        ),
-        BarChartRodData(
-          toY: y2,
-          color: Colors.indigo,
-          width: width,
-        ),
-      ],
     );
   }
 }
@@ -331,7 +234,6 @@ class WeeklyChartState extends State<WeeklyChart> {
               child: BarChart(
                 BarChartData(
                   maxY: 14,
-                  // Adjust max value as needed
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {

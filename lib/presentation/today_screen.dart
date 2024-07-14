@@ -1,24 +1,11 @@
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
-import '../widgets/custom_text_form_field.dart';
 import '../widgets/karamba_value.dart';
-import '../widgets/chart_karamba.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart';
+import '../widgets/chart.dart';
 
 // ignore_for_file: must_be_immutable
 class TodayScreen extends StatelessWidget {
-  TodayScreen({Key? key})
-      : super(
-          key: key,
-        );
-
-  TextEditingController vectornineteenController = TextEditingController();
-
-  TextEditingController vectorController = TextEditingController();
-
-  TextEditingController vector1Controller = TextEditingController();
+  TodayScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +18,12 @@ class TodayScreen extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: 14.v),
-                _buildViewHierarchyList(context),
+                _KarambaValues(context),
                 SizedBox(
                   height: 20,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
+                  padding: const EdgeInsets.only(left: 20),
                   child: Row(
                     children: [
                       Container(
@@ -72,9 +59,9 @@ class TodayScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                ChartKaramba(),
+                TodayChart(),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
+                  padding: const EdgeInsets.only(bottom: 15),
                   child: Text('Jam'),
                 ),
               ],
@@ -85,8 +72,7 @@ class TodayScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
-  Widget _buildViewHierarchyList(BuildContext context) {
+  Widget _KarambaValues(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
         left: 19.h,
@@ -102,7 +88,7 @@ class TodayScreen extends StatelessWidget {
         },
         itemCount: 1,
         itemBuilder: (context, index) {
-          return ViewhierarchylistItemWidget();
+          return KarambaValues();
         },
       ),
     );

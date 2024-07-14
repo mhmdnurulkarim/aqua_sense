@@ -1,14 +1,11 @@
-import '../core/app_export.dart';
+import 'package:flutter/material.dart';
+
 import '../presentation/this_month_screen.dart';
 import '../presentation/today_screen.dart';
 import '../presentation/weekly_screen.dart';
-import 'package:flutter/material.dart';
 
 class AppNavigationScreen extends StatefulWidget {
-  const AppNavigationScreen({Key? key})
-      : super(
-          key: key,
-        );
+  const AppNavigationScreen({Key? key}) : super(key: key);
 
   @override
   State<AppNavigationScreen> createState() => _AppNavigationScreenState();
@@ -83,58 +80,3 @@ class _AppNavigationScreenState extends State<AppNavigationScreen>
     );
   }
 }
-
-// Widget _buildKarambawaColumn(BuildContext context) {
-//   return Container(
-//     padding: EdgeInsets.symmetric(
-//       horizontal: 39.h,
-//       vertical: 6.v,
-//     ),
-//     decoration: AppDecoration.fillBlueGray,
-//     child: Column(
-//       children: [
-//         SizedBox(height: 29.v),
-//         SizedBox(
-//           width: 78,
-//           child: Text(
-//             "Karamba Warning",
-//             maxLines: 2,
-//             overflow: TextOverflow.ellipsis,
-//             textAlign: TextAlign.center,
-//             style: theme.textTheme.titleLarge,
-//           ),
-//         ),
-//         SizedBox(height: 30.v),
-//         Padding(
-//           padding: EdgeInsets.only(right: 2.h),
-//           child: Row(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               Container(
-//                 decoration: AppDecoration.outlineBlack,
-//                 child: Text(
-//                   "Today",
-//                   style: CustomTextStyles.bodySmallInder,
-//                 ),
-//               ),
-//               Spacer(
-//                 flex: 57,
-//               ),
-//               Text(
-//                 "Weekly",
-//                 style: theme.textTheme.bodySmall,
-//               ),
-//               Spacer(
-//                 flex: 42,
-//               ),
-//               Text(
-//                 "this month",
-//                 style: theme.textTheme.bodySmall,
-//               )
-//             ],
-//           ),
-//         )
-//       ],
-//     ),
-//   );
-// }

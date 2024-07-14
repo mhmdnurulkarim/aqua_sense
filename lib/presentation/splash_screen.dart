@@ -15,7 +15,7 @@ class SplashScreen extends StatelessWidget {
         () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: AppRoutes.routes["/tampilan_today_screen"]!),
+                  builder: AppRoutes.routes["/today_screen"]!),
             ));
 
     return SafeArea(
