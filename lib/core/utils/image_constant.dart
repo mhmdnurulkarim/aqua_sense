@@ -6,6 +6,9 @@ class ImageConstant {
   // Alarm images
   static String imgVector = '$imagePath/img_vector.svg';
 
+  //Splash Image
+  static String imgSplash = '$imagePath/fishing_net.png';
+
   // Common images
   static String imgGroup = '$imagePath/img_group.svg';
 

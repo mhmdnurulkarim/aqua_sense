@@ -1,102 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../widgets/chart.dart';
 import '../widgets/widget_utils.dart';
-
-class DataService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  Future<List<WeeklyData>> getWeeklyData() async {
-    List<WeeklyData> weeklyData = [];
-    int currentMonth = currentDate.month;
-    DateTime firstDayOfMonth = DateTime(currentDate.year, currentMonth, 1);
-
-    for (int week = 0; week < 4; week++) {
-      DateTime startOfWeek = firstDayOfMonth.add(Duration(days: week * 7));
-
-      List<double> dailyDoAverages = [];
-      List<double> dailyPhAverages = [];
-
-      for (int day = 0; day < 7; day++) {
-        DateTime currentDate = startOfWeek.add(Duration(days: day));
-        var currentDateFormatted =
-            "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
-        String dayOfWeek = getDayOfWeek(currentDate.weekday);
-
-        var querySnapshot = await _firestore
-            .collection('history')
-            .doc(currentDateFormatted)
-            .collection(dayOfWeek)
-            .get();
-
-        double dailyDoSum = 0;
-        double dailyPhSum = 0;
-        int dataCount = querySnapshot.docs.length;
-
-        if (dataCount > 0) {
-          querySnapshot.docs.forEach((doc) {
-            dailyDoSum += doc['DO'];
-            dailyPhSum += doc['pH'];
-          });
-
-          dailyDoAverages.add(dailyDoSum / dataCount);
-          dailyPhAverages.add(dailyPhSum / dataCount);
-        }
-      }
-
-      if (dailyDoAverages.isNotEmpty && dailyPhAverages.isNotEmpty) {
-        double weeklyDoAverage =
-            dailyDoAverages.reduce((a, b) => a + b) / dailyDoAverages.length;
-        double weeklyPhAverage =
-            dailyPhAverages.reduce((a, b) => a + b) / dailyPhAverages.length;
-        weeklyData.add(WeeklyData(weeklyDoAverage, weeklyPhAverage));
-      }
-    }
-    return weeklyData;
-  }
-
-  Future<List<DailyData>> getDailyData(int weekNumber) async {
-    List<DailyData> dailyData = [];
-    DateTime now = DateTime.now();
-    int currentMonth = now.month;
-    DateTime firstDayOfMonth = DateTime(now.year, currentMonth, 1);
-    DateTime startOfWeek =
-        firstDayOfMonth.add(Duration(days: (weekNumber - 1) * 7));
-
-    for (int day = 0; day < 7; day++) {
-      DateTime currentDate = startOfWeek.add(Duration(days: day));
-      var currentDateFormatted =
-          "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
-      String dayOfWeek = getDayOfWeek(currentDate.weekday);
-
-      var querySnapshot = await _firestore
-          .collection('history')
-          .doc(currentDateFormatted)
-          .collection(dayOfWeek)
-          .get();
-
-      double dailyDoSum = 0;
-      double dailyPhSum = 0;
-      int dataCount = querySnapshot.docs.length;
-
-      if (dataCount > 0) {
-        querySnapshot.docs.forEach((doc) {
-          dailyDoSum += doc['DO'];
-          dailyPhSum += doc['pH'];
-        });
-
-        dailyData
-            .add(DailyData(dailyDoSum / dataCount, dailyPhSum / dataCount));
-      } else {
-        dailyData.add(DailyData(0, 0));
-      }
-    }
-
-    return dailyData;
-  }
-}
 
 class WeeklyScreen extends StatefulWidget {
   @override
@@ -131,10 +36,6 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
       _dailyData = data;
     });
   }
-
-  // Stream<List<DailyData>> _fetchDailyData(int weekNumber) async* {
-  //   yield await _dataService.getDailyData(weekNumber);
-  // }
 
   void _showDataForWeek(BuildContext context, int weekNumber) {
     if (weekNumber <= _weeklyData.length) {
@@ -288,27 +189,6 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
                   : Center(
                       child: Text('Pilih minggu untuk melihat detail harian')),
             ),
-            // Expanded(
-            //   child: StreamBuilder<List<DailyData>>(
-            //     stream: _dailyDataStream,
-            //     builder: (context, snapshot) {
-            //       if (snapshot.connectionState == ConnectionState.waiting) {
-            //         return Center(child: CircularProgressIndicator());
-            //       } else if (snapshot.hasError) {
-            //         return Center(child: Text('Error: ${snapshot.error}'));
-            //       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            //         return Center(
-            //             child:
-            //                 Text('Pilih minggu untuk melihat detail harian'));
-            //       }
-            //
-            //       // Update _dailyData saat stream berubah
-            //       _dailyDataStream = _fetchDailyData(_activeButtonIndex);
-            //
-            //       return BarChartSample2(dailyData: snapshot.data!);
-            //     },
-            //   ),
-            // ),
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: Text('Hari perminggu'),
@@ -457,25 +337,6 @@ class BarChartSample2 extends StatelessWidget {
         ],
       );
     });
-  }
-
-  Widget leftTitles(double value, TitleMeta meta) {
-    if (value % 2 == 0 && value <= 14) {
-      return SideTitleWidget(
-        axisSide: meta.axisSide,
-        space: 0,
-        child: Text(
-          value.toInt().toString(),
-          style: const TextStyle(
-            color: Color(0xff7589a2),
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-        ),
-      );
-    } else {
-      return Container();
-    }
   }
 
   Widget bottomTitles(double value, TitleMeta meta) {

@@ -289,7 +289,7 @@ class WeeklyChartState extends State<WeeklyChart> {
   }
 
   Widget leftTitles(double value, TitleMeta meta) {
-    if (value % 2 == 0 && value <= 14) {
+    if (value % 2 == 0 && value <= 20) {
       return SideTitleWidget(
         axisSide: meta.axisSide,
         space: 0,

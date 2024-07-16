@@ -43,11 +43,6 @@ class _AppNavigationScreenState extends State<AppNavigationScreen>
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              // Assuming you have 'theme' defined somewhere
-              // Change it to your actual theme or define it
-              // in your code.
-              // style: Theme.of(context).textTheme.headline6,
-              // Using headline6 as an example. Adjust as needed.
             ),
           ),
           bottom: TabBar(

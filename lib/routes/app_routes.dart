@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../presentation/app_navigation_screen.dart';
 import '../presentation/splash_screen.dart';
-import '../presentation/testing_weekly.dart';
 import '../presentation/this_month_screen.dart';
 import '../presentation/today_screen.dart';
 import '../presentation/weekly_screen.dart';
@@ -27,6 +26,6 @@ class AppRoutes {
     _WeeklyScreen: (context) => WeeklyScreen(),
     _ThisMonthScreen: (context) => ThisMonthScreen(),
     appNavigationScreen: (context) => AppNavigationScreen(),
-    initialRoute: (context) => AppNavigationScreen()
+    initialRoute: (context) => SplashScreen()
   };
 }

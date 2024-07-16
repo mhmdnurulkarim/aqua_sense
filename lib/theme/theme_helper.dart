@@ -104,7 +104,7 @@ class LightCodeColors {
   Color get black900 => Color(0XFF000000);
 
   // Blue
-  Color get blue200 => Color(0XFF97CADB);
+  Color get blue200 => Color(0XFF59BBDC);
 
   // BlueGray
   Color get blueGray100 => Color(0XFFCCCCCC);
