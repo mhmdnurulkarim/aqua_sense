@@ -19,7 +19,7 @@ String getDayOfWeek(int weekday) {
     case 7:
       return 'minggu';
     default:
-      return 'minggu';
+      return 'senin';
   }
 }
 
@@ -44,8 +44,35 @@ class DailyData {
 class DataService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  //TodayScreen
+  //Fetch Data Weekly & This Month
   Future<DailyData> fetchDailyData(DateTime currentDate) async {
+    var currentDateFormatted =
+        "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
+    String dayOfWeek = getDayOfWeek(currentDate.weekday);
+
+    var querySnapshot = await _firestore
+        .collection('history')
+        .doc(currentDateFormatted)
+        .collection(dayOfWeek)
+        .get();
+
+    double dailyDoSum = 0;
+    double dailyPhSum = 0;
+    int dataCount = querySnapshot.docs.length;
+
+    if (dataCount > 0) {
+      querySnapshot.docs.forEach((doc) {
+        dailyDoSum += doc['DO'];
+        dailyPhSum += doc['pH'];
+      });
+      return DailyData(dailyDoSum / dataCount, dailyPhSum / dataCount);
+    } else {
+      return DailyData(0, 0);
+    }
+  }
+
+  //TodayScreen
+  Future<DailyData> getTodayData(DateTime currentDate) async {
     var currentDateFormatted =
         "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
     String dayOfWeek = getDayOfWeek(currentDate.weekday);
