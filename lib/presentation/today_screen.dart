@@ -1,95 +1,137 @@
 import 'package:flutter/material.dart';
-import '../core/utils/app_export.dart';
-import '../widgets/karamba_value.dart';
-import '../widgets/chart.dart';
 
-class TodayScreen extends StatelessWidget {
-  TodayScreen({Key? key}) : super(key: key);
+import '../core/utils/app_export.dart';
+import '../widgets/chart.dart';
+import '../widgets/widget_utils.dart';
+
+class TodayScreen extends StatefulWidget {
+  @override
+  State<TodayScreen> createState() => _TodayScreenState();
+}
+
+class _TodayScreenState extends State<TodayScreen> {
+  final DataService _dataService = DataService();
+
+  List<DataPoint> _todayData = [];
+  List<String> _bottomTitles = [];
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTodayData();
+  }
+
+  Future<void> _fetchTodayData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final data = await _dataService.getTodayData();
+    setState(() {
+      _todayData = data;
+      _bottomTitles = _todayData.map((dataPoint) => dataPoint.titleToday).toList();
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: SingleChildScrollView(
-          child: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              children: [
-                SizedBox(height: 14.v),
-                _KarambaValues(context),
-                SizedBox(
-                  height: 20,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: Colors.amber,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [Text('DO')],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: Colors.indigo,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'pH',
-                              style: TextStyle(color: Colors.white),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
+    return FutureBuilder<List<DataPoint>>(
+        future: _dataService.getTodayData(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                child: Text('Error: ${snapshot.error}'),
+              ),
+            );
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            double doAvg = snapshot.data!
+                    .map((data) => data.doAverage)
+                    .reduce((a, b) => a + b) /
+                snapshot.data!.length;
+            double phAvg = snapshot.data!
+                    .map((data) => data.phAverage)
+                    .reduce((a, b) => a + b) /
+                snapshot.data!.length;
+
+            return SafeArea(
+              child: Scaffold(
+                resizeToAvoidBottomInset: false,
+                body: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16),
+                    child: Column(
+                      children: [
+                        _isLoading
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              )
+                            : Column(
+                                children: [
+                                  SizedBox(height: 14.v),
+                                  ValueContainer(
+                                    label: 'pH',
+                                    value: phAvg,
+                                  ),
+                                  SizedBox(height: 10),
+                                  ValueContainer(
+                                    label: 'DO',
+                                    value: doAvg,
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Padding(
+                                    padding: padding10,
+                                    child: Row(
+                                      children: [
+                                        LegendItem(
+                                            label: 'DO', color: Colors.amber),
+                                        SizedBox(width: 10),
+                                        LegendItem(
+                                            label: 'pH',
+                                            color: Colors.indigo,
+                                            textStyle: textStyleBoldWhite),
+                                      ],
+                                    ),
+                                  ),
+                                  CustomBarChart(
+                                    dataPoint: _todayData,
+                                    bottomTitles: _bottomTitles,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 15),
+                                    child: Text('Jam'),
+                                  ),
+                                ],
+                              ),
+                      ],
+                    ),
                   ),
                 ),
-                TodayChart(),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 15),
-                  child: Text('Jam'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _KarambaValues(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 19.h,
-        right: 23.h,
-      ),
-      child: ListView.separated(
-        physics: NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        separatorBuilder: (context, index) {
-          return SizedBox(
-            height: 18.v,
-          );
-        },
-        itemCount: 1,
-        itemBuilder: (context, index) {
-          return KarambaValues();
-        },
-      ),
-    );
+              ),
+            );
+          } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                child: Text('Tidak ada data tersedia'),
+              ),
+            );
+          } else {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                child: Text('Mohon tunggu, sedang mengkalkulasi data'),
+              ),
+            );
+          }
+        });
   }
 }

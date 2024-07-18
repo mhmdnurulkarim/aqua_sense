@@ -1,9 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+
+const padding8 = EdgeInsets.all(8);
+const padding10 = EdgeInsets.only(left: 10);
+const textStyleBoldWhite = TextStyle(color: Colors.white);
 
 String getDayOfWeek(int weekday) {
   switch (weekday) {
+    case 0:
+      return 'minggu';
     case 1:
       return 'senin';
     case 2:
@@ -16,43 +21,26 @@ String getDayOfWeek(int weekday) {
       return 'jumat';
     case 6:
       return 'sabtu';
-    case 7:
-      return 'minggu';
     default:
-      return 'senin';
+      return 'minggu';
   }
 }
 
 class DataPoint {
   final double doAverage;
   final double phAverage;
+  final String titleToday;
 
-  DataPoint(this.doAverage, this.phAverage);
+  DataPoint(this.doAverage, this.phAverage, this.titleToday);
 }
-
-// class WeeklyData {
-//   final double doAverage;
-//   final double phAverage;
-//
-//   WeeklyData(this.doAverage, this.phAverage);
-//
-//   String get doAverageFormatted => doAverage.toStringAsFixed(2);
-//
-//   String get phAverageFormatted => phAverage.toStringAsFixed(2);
-// }
-//
-// class DailyData {
-//   final double doAverage;
-//   final double phAverage;
-//
-//   DailyData(this.doAverage, this.phAverage);
-// }
 
 class DataService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   //TodayScreen
-  Future<DataPoint> getTodayData(DateTime currentDate) async {
+  Future<List<DataPoint>> getTodayData() async {
+    DateTime currentDate = DateTime.now();
+    // DateTime currentDate = DateTime(2024, 7, 13);
     var currentDateFormatted =
         "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
     String dayOfWeek = getDayOfWeek(currentDate.weekday);
@@ -63,17 +51,27 @@ class DataService {
         .collection(dayOfWeek)
         .get();
 
-    double dailyDoSum = 0;
-    double dailyPhSum = 0;
-    var docs = querySnapshot.docs;
+    List<DataPoint> todayData = [];
+    double todayDo = 0;
+    double todayPh = 0;
+    String titleToday = "";
     int dataCount = querySnapshot.docs.length;
 
-    for (var doc in docs) {
-      dailyDoSum += doc['DO'];
-      dailyPhSum += doc['pH'];
+    if (dataCount > 0) {
+      querySnapshot.docs.forEach((doc) {
+        todayDo = doc['DO'] != null ? doc['DO'].toDouble() : 0;
+        todayPh = doc['pH'] != null ? doc['pH'].toDouble() : 0;
+        titleToday = doc['Jam'] != null ? doc['Jam'].toString() : '';
+        if (titleToday.length >= 5) {
+          titleToday =
+              titleToday.substring(0, 5); // Extract HH:mm from the string
+        }
+
+        todayData.add(DataPoint(todayDo, todayPh, titleToday));
+      });
     }
 
-    return dataCount > 0 ? DataPoint(dailyDoSum, dailyPhSum) : DataPoint(0, 0);
+    return todayData;
   }
 
   //Fetch Data Weekly & This Month
@@ -94,12 +92,12 @@ class DataService {
 
     if (dataCount > 0) {
       querySnapshot.docs.forEach((doc) {
-        dailyDoSum += doc['DO'];
-        dailyPhSum += doc['pH'];
+        dailyDoSum += doc['DO'] != null ? doc['DO'].toDouble() : 0;
+        dailyPhSum += doc['pH'] != null ? doc['pH'].toDouble() : 0;
       });
-      return DataPoint(dailyDoSum / dataCount, dailyPhSum / dataCount);
+      return DataPoint(dailyDoSum / dataCount, dailyPhSum / dataCount, "");
     } else {
-      return DataPoint(0, 0);
+      return DataPoint(0, 0, "");
     }
   }
 
@@ -158,52 +156,14 @@ class DataService {
         double weeklyPhSum =
             dailyDataList.map((d) => d.phAverage).reduce((a, b) => a + b);
         weeklyData.add(DataPoint(weeklyDoSum / dailyDataList.length,
-            weeklyPhSum / dailyDataList.length));
+            weeklyPhSum / dailyDataList.length, ""));
       } else {
-        weeklyData.add(DataPoint(0, 0));
+        weeklyData.add(DataPoint(0, 0, ""));
       }
     }
 
     return weeklyData;
   }
-}
-
-Widget leftTitles(double value, TitleMeta meta) {
-  if (value % 2 == 0 && value <= 20) {
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      space: 0,
-      child: Text(
-        value.toInt().toString(),
-        style: const TextStyle(
-          color: Color(0xff7589a2),
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-        ),
-      ),
-    );
-  } else {
-    return Container();
-  }
-}
-
-BarChartGroupData makeGroupData(int x, double y1, double y2) {
-  return BarChartGroupData(
-    barsSpace: 4,
-    x: x,
-    barRods: [
-      BarChartRodData(
-        toY: y1,
-        color: Colors.amber,
-        width: 7,
-      ),
-      BarChartRodData(
-        toY: y2,
-        color: Colors.indigo,
-        width: 7,
-      ),
-    ],
-  );
 }
 
 //Section Header
@@ -228,6 +188,7 @@ class SectionHeader extends StatelessWidget {
   }
 }
 
+// Value Container
 class ValueContainer extends StatelessWidget {
   final String label;
   final double value;
@@ -270,6 +231,7 @@ class ValueContainer extends StatelessWidget {
   }
 }
 
+// Legend Item
 class LegendItem extends StatelessWidget {
   final String label;
   final Color color;

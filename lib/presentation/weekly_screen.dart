@@ -146,10 +146,6 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
   }
 
   Widget _buildWeeklyDetails() {
-    const padding8 = EdgeInsets.all(8);
-    const padding10 = EdgeInsets.only(left: 10);
-    const textStyleBoldWhite = TextStyle(color: Colors.white);
-
     return Expanded(
       child: SingleChildScrollView(
         child: Padding(

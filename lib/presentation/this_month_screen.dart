@@ -11,7 +11,7 @@ class ThisMonthScreen extends StatefulWidget {
 class _ThisMonthScreenState extends State<ThisMonthScreen> {
   final DataService _dataService = DataService();
   List<DataPoint> _weeklyData = [];
-  List<String> bottomTitles = [];
+  List<String> _bottomTitles = [];
   bool _isLoading = false;
 
   @override
@@ -28,19 +28,13 @@ class _ThisMonthScreenState extends State<ThisMonthScreen> {
     final data = await _dataService.getWeeklyData();
     setState(() {
       _weeklyData = data;
+      _bottomTitles = List.generate(_weeklyData.length, (index) => (index + 1).toString());
       _isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    const padding8 = EdgeInsets.all(8);
-    const padding10 = EdgeInsets.only(left: 10);
-    const textStyleBoldWhite = TextStyle(color: Colors.white);
-
-    List<String> bottomTitles =
-        List.generate(_weeklyData.length, (index) => (index + 1).toString());
-
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -74,9 +68,9 @@ class _ThisMonthScreenState extends State<ThisMonthScreen> {
                         ),
                       ),
                       CustomBarChart(
-                          dataPoint: _weeklyData, bottomTitles: bottomTitles),
+                          dataPoint: _weeklyData, bottomTitles: _bottomTitles),
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 0),
+                        padding: const EdgeInsets.only(bottom: 15),
                         child: Text('Hari perminggu'),
                       ),
                     ],
