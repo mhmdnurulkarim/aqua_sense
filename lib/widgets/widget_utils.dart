@@ -23,56 +23,36 @@ String getDayOfWeek(int weekday) {
   }
 }
 
-class WeeklyData {
+class DataPoint {
   final double doAverage;
   final double phAverage;
 
-  WeeklyData(this.doAverage, this.phAverage);
-
-  String get doAverageFormatted => doAverage.toStringAsFixed(2);
-
-  String get phAverageFormatted => phAverage.toStringAsFixed(2);
+  DataPoint(this.doAverage, this.phAverage);
 }
 
-class DailyData {
-  final double doAverage;
-  final double phAverage;
-
-  DailyData(this.doAverage, this.phAverage);
-}
+// class WeeklyData {
+//   final double doAverage;
+//   final double phAverage;
+//
+//   WeeklyData(this.doAverage, this.phAverage);
+//
+//   String get doAverageFormatted => doAverage.toStringAsFixed(2);
+//
+//   String get phAverageFormatted => phAverage.toStringAsFixed(2);
+// }
+//
+// class DailyData {
+//   final double doAverage;
+//   final double phAverage;
+//
+//   DailyData(this.doAverage, this.phAverage);
+// }
 
 class DataService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  //Fetch Data Weekly & This Month
-  Future<DailyData> fetchDailyData(DateTime currentDate) async {
-    var currentDateFormatted =
-        "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
-    String dayOfWeek = getDayOfWeek(currentDate.weekday);
-
-    var querySnapshot = await _firestore
-        .collection('history')
-        .doc(currentDateFormatted)
-        .collection(dayOfWeek)
-        .get();
-
-    double dailyDoSum = 0;
-    double dailyPhSum = 0;
-    int dataCount = querySnapshot.docs.length;
-
-    if (dataCount > 0) {
-      querySnapshot.docs.forEach((doc) {
-        dailyDoSum += doc['DO'];
-        dailyPhSum += doc['pH'];
-      });
-      return DailyData(dailyDoSum / dataCount, dailyPhSum / dataCount);
-    } else {
-      return DailyData(0, 0);
-    }
-  }
-
   //TodayScreen
-  Future<DailyData> getTodayData(DateTime currentDate) async {
+  Future<DataPoint> getTodayData(DateTime currentDate) async {
     var currentDateFormatted =
         "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
     String dayOfWeek = getDayOfWeek(currentDate.weekday);
@@ -93,25 +73,52 @@ class DataService {
       dailyPhSum += doc['pH'];
     }
 
-    return dataCount > 0 ? DailyData(dailyDoSum, dailyPhSum) : DailyData(0, 0);
+    return dataCount > 0 ? DataPoint(dailyDoSum, dailyPhSum) : DataPoint(0, 0);
+  }
+
+  //Fetch Data Weekly & This Month
+  Future<DataPoint> fetchDailyData(DateTime currentDate) async {
+    var currentDateFormatted =
+        "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
+    String dayOfWeek = getDayOfWeek(currentDate.weekday);
+
+    var querySnapshot = await _firestore
+        .collection('history')
+        .doc(currentDateFormatted)
+        .collection(dayOfWeek)
+        .get();
+
+    double dailyDoSum = 0;
+    double dailyPhSum = 0;
+    int dataCount = querySnapshot.docs.length;
+
+    if (dataCount > 0) {
+      querySnapshot.docs.forEach((doc) {
+        dailyDoSum += doc['DO'];
+        dailyPhSum += doc['pH'];
+      });
+      return DataPoint(dailyDoSum / dataCount, dailyPhSum / dataCount);
+    } else {
+      return DataPoint(0, 0);
+    }
   }
 
 //WeeklyScreen
-  Future<List<DailyData>> getDailyData(int weekNumber) async {
-    List<DailyData> dailyData = [];
+  Future<List<DataPoint>> getDailyData(int weekNumber) async {
+    List<DataPoint> dailyData = [];
     DateTime now = DateTime.now();
     int currentMonth = now.month;
     DateTime firstDayOfMonth = DateTime(now.year, currentMonth, 1);
     DateTime lastDayOfMonth = DateTime(now.year, currentMonth + 1, 0);
 
     DateTime startOfWeek =
-    firstDayOfMonth.add(Duration(days: (weekNumber - 1) * 7));
+        firstDayOfMonth.add(Duration(days: (weekNumber - 1) * 7));
     DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
     if (endOfWeek.month != currentMonth) {
       endOfWeek = lastDayOfMonth;
     }
 
-    List<Future<DailyData>> dailyDataFutures = [];
+    List<Future<DataPoint>> dailyDataFutures = [];
     for (int day = 0; day < 7; day++) {
       DateTime currentDate = startOfWeek.add(Duration(days: day));
       if (currentDate.month != currentMonth || currentDate.isAfter(endOfWeek))
@@ -124,8 +131,8 @@ class DataService {
   }
 
   //ThisMonthScreen
-  Future<List<WeeklyData>> getWeeklyData() async {
-    List<WeeklyData> weeklyData = [];
+  Future<List<DataPoint>> getWeeklyData() async {
+    List<DataPoint> weeklyData = [];
     DateTime now = DateTime.now();
     int currentMonth = now.month;
     DateTime firstDayOfMonth = DateTime(now.year, currentMonth, 1);
@@ -137,23 +144,23 @@ class DataService {
         endOfWeek = DateTime(now.year, currentMonth + 1, 0);
       }
 
-      List<Future<DailyData>> dailyDataFutures = [];
+      List<Future<DataPoint>> dailyDataFutures = [];
       for (int day = 0; day < 7; day++) {
         DateTime currentDate = startOfWeek.add(Duration(days: day));
         if (currentDate.month != currentMonth) break;
         dailyDataFutures.add(fetchDailyData(currentDate));
       }
 
-      List<DailyData> dailyDataList = await Future.wait(dailyDataFutures);
+      List<DataPoint> dailyDataList = await Future.wait(dailyDataFutures);
       if (dailyDataList.isNotEmpty) {
         double weeklyDoSum =
-        dailyDataList.map((d) => d.doAverage).reduce((a, b) => a + b);
+            dailyDataList.map((d) => d.doAverage).reduce((a, b) => a + b);
         double weeklyPhSum =
-        dailyDataList.map((d) => d.phAverage).reduce((a, b) => a + b);
-        weeklyData.add(WeeklyData(weeklyDoSum / dailyDataList.length,
+            dailyDataList.map((d) => d.phAverage).reduce((a, b) => a + b);
+        weeklyData.add(DataPoint(weeklyDoSum / dailyDataList.length,
             weeklyPhSum / dailyDataList.length));
       } else {
-        weeklyData.add(WeeklyData(0, 0));
+        weeklyData.add(DataPoint(0, 0));
       }
     }
 
@@ -197,4 +204,96 @@ BarChartGroupData makeGroupData(int x, double y1, double y2) {
       ),
     ],
   );
+}
+
+//Section Header
+class SectionHeader extends StatelessWidget {
+  final String text;
+  final EdgeInsets padding;
+
+  SectionHeader({required this.text, required this.padding});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: padding,
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 16),
+        ),
+      ),
+    );
+  }
+}
+
+class ValueContainer extends StatelessWidget {
+  final String label;
+  final double value;
+
+  ValueContainer({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blueGrey,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: 11),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Text(
+            value.toStringAsFixed(2),
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LegendItem extends StatelessWidget {
+  final String label;
+  final Color color;
+  final TextStyle? textStyle;
+
+  LegendItem({required this.label, required this.color, this.textStyle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(3),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: textStyle ?? TextStyle(color: Colors.black),
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/app_export.dart';
+import '../core/utils/app_export.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -8,7 +8,7 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future.delayed(
-      Duration(seconds: 5),
+      Duration(seconds: 2),
       () => Navigator.pushReplacement(
         context,
         MaterialPageRoute(
