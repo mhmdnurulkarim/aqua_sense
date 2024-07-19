@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../core/utils/app_export.dart';
 import '../widgets/chart.dart';
@@ -16,10 +20,36 @@ class _TodayScreenState extends State<TodayScreen> {
   List<String> _bottomTitles = [];
   bool _isLoading = false;
 
+  double doAvg = 0;
+  double phAvg = 0;
+  StreamSubscription<DocumentSnapshot>? _subscription;
+
+
   @override
   void initState() {
     super.initState();
     _fetchTodayData();
+
+    _subscription = FirebaseFirestore.instance
+        .collection('karamba')
+        .doc(DateFormat('yyyy-MM-dd').format(DateTime.now()))
+        // .doc(DateFormat('yyyy-MM-dd').format(DateTime(2024, 7, 13)))
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists) {
+        final historyData = snapshot.data() as Map<String, dynamic>;
+        setState(() {
+          phAvg = historyData['pH'];
+          doAvg = historyData['DO'];
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _fetchTodayData() async {
@@ -48,14 +78,14 @@ class _TodayScreenState extends State<TodayScreen> {
               ),
             );
           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            double doAvg = snapshot.data!
-                    .map((data) => data.doAverage)
-                    .reduce((a, b) => a + b) /
-                snapshot.data!.length;
-            double phAvg = snapshot.data!
-                    .map((data) => data.phAverage)
-                    .reduce((a, b) => a + b) /
-                snapshot.data!.length;
+            // double doAvg = snapshot.data!
+            //         .map((data) => data.doAverage)
+            //         .reduce((a, b) => a + b) /
+            //     snapshot.data!.length;
+            // double phAvg = snapshot.data!
+            //         .map((data) => data.phAverage)
+            //         .reduce((a, b) => a + b) /
+            //     snapshot.data!.length;
 
             return SafeArea(
               child: Scaffold(
