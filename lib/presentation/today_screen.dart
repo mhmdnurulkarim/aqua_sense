@@ -1,10 +1,9 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
-import '../core/utils/app_export.dart';
+import '../core/data_service.dart';
+import '../core/notification_service.dart';
 import '../widgets/chart.dart';
 import '../widgets/widget_utils.dart';
 
@@ -15,6 +14,7 @@ class TodayScreen extends StatefulWidget {
 
 class _TodayScreenState extends State<TodayScreen> {
   final DataService _dataService = DataService();
+  final NotificationService _notificationService = NotificationService();
 
   List<DataPoint> _todayData = [];
   List<String> _bottomTitles = [];
@@ -22,27 +22,22 @@ class _TodayScreenState extends State<TodayScreen> {
 
   double doAvg = 0;
   double phAvg = 0;
-  StreamSubscription<DocumentSnapshot>? _subscription;
-
+  StreamSubscription<Map<String, dynamic>>? _subscription;
 
   @override
   void initState() {
     super.initState();
     _fetchTodayData();
+    _notificationService.initialize();
 
-    _subscription = FirebaseFirestore.instance
-        .collection('karamba')
-        .doc(DateFormat('yyyy-MM-dd').format(DateTime.now()))
-        // .doc(DateFormat('yyyy-MM-dd').format(DateTime(2024, 7, 13)))
-        .snapshots()
-        .listen((snapshot) {
-      if (snapshot.exists) {
-        final historyData = snapshot.data() as Map<String, dynamic>;
-        setState(() {
-          phAvg = historyData['pH'];
-          doAvg = historyData['DO'];
-        });
-      }
+    _subscription = _dataService.listenToTodayData().listen((data) {
+      setState(() {
+        phAvg = data['pH'] ?? 0;
+        doAvg = data['DO'] ?? 0;
+      });
+
+      // Periksa dan tampilkan notifikasi jika nilai mendekati 0
+      _notificationService.checkAndNotify(phAvg, doAvg);
     });
   }
 
@@ -78,15 +73,6 @@ class _TodayScreenState extends State<TodayScreen> {
               ),
             );
           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            // double doAvg = snapshot.data!
-            //         .map((data) => data.doAverage)
-            //         .reduce((a, b) => a + b) /
-            //     snapshot.data!.length;
-            // double phAvg = snapshot.data!
-            //         .map((data) => data.phAverage)
-            //         .reduce((a, b) => a + b) /
-            //     snapshot.data!.length;
-
             return SafeArea(
               child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -104,7 +90,7 @@ class _TodayScreenState extends State<TodayScreen> {
                               )
                             : Column(
                                 children: [
-                                  SizedBox(height: 14.v),
+                                  SizedBox(height: 14),
                                   ValueContainer(
                                     label: 'pH',
                                     value: phAvg,
@@ -131,7 +117,7 @@ class _TodayScreenState extends State<TodayScreen> {
                                       ],
                                     ),
                                   ),
-                                  CustomBarChart(
+                                  CustomLineChart(
                                     dataPoint: _todayData,
                                     bottomTitles: _bottomTitles,
                                   ),

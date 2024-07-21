@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/chart.dart';
+import '../core/data_service.dart';
 import '../widgets/widget_utils.dart';
 
 class WeeklyScreen extends StatefulWidget {
@@ -38,7 +39,8 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
     final data = await _dataService.getDailyData(weekNumber);
     setState(() {
       _dailyData = data;
-      _bottomTitles = List.generate(_dailyData!.length, (index) => (index + 1).toString());
+      _bottomTitles =
+          List.generate(_dailyData!.length, (index) => (index + 1).toString());
       _isLoading = false;
     });
   }
@@ -189,7 +191,7 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
                           ),
                         ),
                         if (_dailyData != null)
-                          CustomBarChart(
+                          CustomLineChart(
                               dataPoint: _dailyData!,
                               bottomTitles: _bottomTitles),
                         Text('Hari perminggu'),

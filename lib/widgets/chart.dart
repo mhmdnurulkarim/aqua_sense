@@ -1,17 +1,18 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import '../widgets/widget_utils.dart';
 
-class CustomBarChart extends StatelessWidget {
+import '../core/data_service.dart';
+
+class CustomLineChart extends StatelessWidget {
   final List<DataPoint> dataPoint;
   final List<String> bottomTitles;
 
-  CustomBarChart({required this.dataPoint, required this.bottomTitles});
+  CustomLineChart({required this.dataPoint, required this.bottomTitles});
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1,
+      aspectRatio: 0.8,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -19,42 +20,43 @@ class CustomBarChart extends StatelessWidget {
           children: <Widget>[
             const SizedBox(height: 12),
             Expanded(
-              child: _buildBarChart(),
+              child: _buildChart(),
             ),
-            const SizedBox(height: 12),
           ],
         ),
       ),
     );
   }
 
-  BarChart _buildBarChart() {
-    return BarChart(
-      BarChartData(
+  LineChart _buildChart() {
+    return LineChart(
+      LineChartData(
         maxY: 20,
-        barTouchData: _buildBarTouchData(),
+        minY: 0,
+        lineTouchData: _buildLineTouchData(),
         titlesData: _buildTitlesData(),
         borderData: FlBorderData(show: false),
-        barGroups: _generateDailyBarGroups(),
+        lineBarsData: _generateLineBarData(),
         gridData: const FlGridData(show: false),
       ),
     );
   }
 
-  BarTouchData _buildBarTouchData() {
-    return BarTouchData(
-      touchTooltipData: BarTouchTooltipData(
-        getTooltipItem: (group, groupIndex, rod, rodIndex) {
-          return BarTooltipItem(
-            rod.toY.toString(),
-            const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          );
+  LineTouchData _buildLineTouchData() {
+    return LineTouchData(
+      touchTooltipData: LineTouchTooltipData(
+        getTooltipItems: (touchedSpots) {
+          return touchedSpots.map((touchedSpot) {
+            return LineTooltipItem(
+              touchedSpot.y.toString(),
+              const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          }).toList();
         },
       ),
-      touchCallback: (FlTouchEvent event, BarTouchResponse? response) {},
     );
   }
 
@@ -86,26 +88,33 @@ class CustomBarChart extends StatelessWidget {
     );
   }
 
-  List<BarChartGroupData> _generateDailyBarGroups() {
-    return List.generate(dataPoint.length, (i) {
+  List<LineChartBarData> _generateLineBarData() {
+    List<FlSpot> doSpots = List.generate(dataPoint.length, (i) {
       final daily = dataPoint[i];
-      return BarChartGroupData(
-        barsSpace: 4,
-        x: i,
-        barRods: [
-          BarChartRodData(
-            toY: daily.doAverage,
-            color: Colors.amber,
-            width: 7,
-          ),
-          BarChartRodData(
-            toY: daily.phAverage,
-            color: Colors.indigo,
-            width: 7,
-          ),
-        ],
-      );
+      return FlSpot(i.toDouble(), daily.doAverage);
     });
+
+    List<FlSpot> phSpots = List.generate(dataPoint.length, (i) {
+      final daily = dataPoint[i];
+      return FlSpot(i.toDouble(), daily.phAverage);
+    });
+
+    return [
+      LineChartBarData(
+        spots: doSpots,
+        isCurved: true,
+        color: Colors.amber,
+        barWidth: 3,
+        belowBarData: BarAreaData(show: false),
+      ),
+      LineChartBarData(
+        spots: phSpots,
+        isCurved: true,
+        color: Colors.indigo,
+        barWidth: 3,
+        belowBarData: BarAreaData(show: false),
+      ),
+    ];
   }
 
   Widget _bottomTitles(double value, TitleMeta meta, List<String> titles) {
@@ -129,7 +138,7 @@ class CustomBarChart extends StatelessWidget {
   }
 
   Widget _leftTitles(double value, TitleMeta meta) {
-    if (value <= 20) {
+    if (value % 2 == 0 && value <= 20) {
       return SideTitleWidget(
         axisSide: meta.axisSide,
         space: 8,

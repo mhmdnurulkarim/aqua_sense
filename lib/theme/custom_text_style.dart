@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/utils/app_export.dart';
+import '../core/app_export.dart';
 
 extension on TextStyle {
   TextStyle get jua {
@@ -43,6 +43,6 @@ class CustomTextStyles {
   static get headlineSmallInterBlack900 =>
       theme.textTheme.headlineSmall!.inter.copyWith(
         color: appTheme.black900,
-        fontSize: 24.fSize,
+        fontSize: 24,
       );
 }

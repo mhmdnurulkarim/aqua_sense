@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/utils/app_export.dart';
+import '../core/app_export.dart';
 
 String _appTheme = "lightCode";
 
@@ -61,31 +61,31 @@ class TextThemes {
   static TextTheme textTheme(ColorScheme colorScheme) => TextTheme(
         bodySmall: TextStyle(
           color: appTheme.black900,
-          fontSize: 12.fSize,
+          fontSize: 12,
           fontFamily: 'Inter',
           fontWeight: FontWeight.w400,
         ),
         displayMedium: TextStyle(
           color: appTheme.whiteA700,
-          fontSize: 40.fSize,
+          fontSize: 40,
           fontFamily: 'Jua',
           fontWeight: FontWeight.w400,
         ),
         headlineLarge: TextStyle(
           color: appTheme.black900,
-          fontSize: 30.fSize,
+          fontSize: 30,
           fontFamily: 'Itim',
           fontWeight: FontWeight.w400,
         ),
         headlineSmall: TextStyle(
           color: appTheme.whiteA700,
-          fontSize: 25.fSize,
+          fontSize: 25,
           fontFamily: 'Jua',
           fontWeight: FontWeight.w400,
         ),
         titleLarge: TextStyle(
           color: appTheme.black900,
-          fontSize: 20.fSize,
+          fontSize: 20,
           fontFamily: 'Itim',
           fontWeight: FontWeight.w400,
         ),
