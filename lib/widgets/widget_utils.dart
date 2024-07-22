@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 const padding8 = EdgeInsets.all(8);
 const padding10 = EdgeInsets.only(left: 10);
 const textStyleBoldWhite = TextStyle(color: Colors.white);
+
+//Localizations
+String formatDateInIndonesian(DateTime date) {
+  final DateFormat formatter = DateFormat('EEEE/dd-MM-yyyy', 'id_ID');
+  return formatter.format(date);
+}
 
 //Section Header
 class SectionHeader extends StatelessWidget {

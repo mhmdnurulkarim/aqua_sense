@@ -75,32 +75,55 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
 
   Widget _buildBottomSheetContent() {
     return SingleChildScrollView(
-      child: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                SectionHeader(
-                  text: 'Rata-rata Harian',
-                  padding: padding8,
-                ),
-                if (_todayData != null)
-                  CustomLineChart(
-                    dataPoint: _todayData,
-                    bottomTitles: _bottomTitles,
+        child: Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16),
+      child: Column(children: [
+        _isLoading
+            ? Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            : Column(
+                children: [
+                  SizedBox(height: 20),
+                  // SectionHeader(
+                  //   text: 'Rata-rata Mingguan',
+                  //   padding: padding8,
+                  // ),
+                  ValueContainer(
+                    label: 'pH',
+                    value: _todayData[0].phAverage,
                   ),
-                ValueContainer(
-                  label: 'pH',
-                  value: _todayData[0].phAverage,
-                ),
-                SizedBox(height: 10),
-                ValueContainer(
-                  label: 'DO',
-                  value: _todayData[0].doAverage,
-                ),
-                SizedBox(height: 15),
-              ],
-            ),
-    );
+                  SizedBox(height: 10),
+                  ValueContainer(
+                    label: 'DO',
+                    value: _todayData[0].doAverage,
+                  ),
+                  SizedBox(height: 15),
+                  Padding(
+                    padding: padding10,
+                    child: Row(
+                      children: [
+                        LegendItem(label: 'DO', color: Colors.amber),
+                        SizedBox(width: 10),
+                        LegendItem(
+                            label: 'pH',
+                            color: Colors.indigo,
+                            textStyle: textStyleBoldWhite),
+                      ],
+                    ),
+                  ),
+                  if (_todayData != null)
+                    CustomLineChart(
+                      dataPoint: _todayData,
+                      bottomTitles: _bottomTitles,
+                    ),
+                  Text('Jam'),
+                  SizedBox(height: 15),
+                ],
+              ),
+      ]),
+    ));
   }
 
   @override
@@ -198,24 +221,23 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
     return _dailyDates.isEmpty
         ? Container()
         : Expanded(
-      child: ListView.builder(
-        itemCount: _dailyDates.length,
-        itemBuilder: (context, index) {
-          final date = _dailyDates[index];
-          final formattedDate =
-          DateFormat('EEEE/dd-MM-yyyy').format(date);
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0),
-            child: ElevatedButton(
-              child: Text(formattedDate),
-              onPressed: () {
-                _showDataBottomSheet(date);
+            child: ListView.builder(
+              itemCount: _dailyDates.length,
+              itemBuilder: (context, index) {
+                final date = _dailyDates[index];
+                final formattedDate = formatDateInIndonesian(date);
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0),
+                  child: ElevatedButton(
+                    child: Text(formattedDate),
+                    onPressed: () {
+                      _showDataBottomSheet(date);
+                    },
+                  ),
+                );
               },
             ),
           );
-        },
-      ),
-    );
   }
 }
 

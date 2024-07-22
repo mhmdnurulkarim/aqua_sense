@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sizer/sizer.dart';
 
 import 'core/app_export.dart';
@@ -22,6 +23,17 @@ class MyApp extends StatelessWidget {
     return Sizer(
       builder: (context, orientation, deviceType) {
         return MaterialApp(
+          locale: Locale('id', 'ID'),
+          // Set locale ke bahasa Indonesia
+          supportedLocales: [
+            Locale('id', 'ID'), // Mendukung bahasa Indonesia
+          ],
+          localizationsDelegates: [
+            // Set lokalizers untuk bahasa Indonesia
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
           theme: theme,
           title: 'Karamba Warning',
           debugShowCheckedModeBanner: false,
