@@ -16,8 +16,9 @@ class _TodayScreenState extends State<TodayScreen> {
   final DataService _dataService = DataService();
   final NotificationService _notificationService = NotificationService();
 
-  // DateTime currentDate = DateTime.now();
-  DateTime currentDate = DateTime(2024,7,19);
+  DateTime currentDate = DateTime.now();
+  // DateTime currentDate = DateTime(2024,7,19);
+
   List<DataPoint> _todayData = [];
   List<String> _bottomTitles = [];
   bool _isLoading = false;
@@ -57,7 +58,8 @@ class _TodayScreenState extends State<TodayScreen> {
     final data = await _dataService.getTodayData(currentDate);
     setState(() {
       _todayData = data;
-      _bottomTitles = _todayData.map((dataPoint) => dataPoint.titleToday).toList();
+      _bottomTitles =
+          _todayData.map((dataPoint) => dataPoint.titleToday).toList();
       _isLoading = false;
     });
   }
@@ -72,6 +74,13 @@ class _TodayScreenState extends State<TodayScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 child: Text('Error: ${snapshot.error}'),
+              ),
+            );
+          } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                child: Text('Tidak ada data tersedia'),
               ),
             );
           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
@@ -133,13 +142,6 @@ class _TodayScreenState extends State<TodayScreen> {
                     ),
                   ),
                 ),
-              ),
-            );
-          } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                child: Text('Tidak ada data tersedia'),
               ),
             );
           } else {

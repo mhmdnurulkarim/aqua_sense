@@ -84,6 +84,13 @@ class _ThisMonthScreenState extends State<ThisMonthScreen> {
               child: Text('Error: ${snapshot.error}'),
             ),
           );
+        } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              child: Text('Tidak ada data tersedia'),
+            ),
+          );
         } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           return Center(
             child: Padding(
@@ -126,13 +133,6 @@ class _ThisMonthScreenState extends State<ThisMonthScreen> {
                   ),
                 ),
               ),
-            ),
-          );
-        } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-          return Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-              child: Text('Tidak ada data tersedia'),
             ),
           );
         } else {

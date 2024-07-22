@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
-import '../widgets/chart.dart';
 import '../core/data_service.dart';
+import '../widgets/chart.dart';
 import '../widgets/widget_utils.dart';
 
 class WeeklyScreen extends StatefulWidget {
@@ -19,6 +18,8 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
 
   bool _isLoadingDailyButtons = false;
   List<DateTime> _dailyDates = [];
+
+  DateTime? _selectedDate;
 
   @override
   void initState() {
@@ -37,9 +38,22 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
         _bottomTitles =
             _todayData.map((dataPoint) => dataPoint.titleToday).toList();
       });
+
+      if (_todayData.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Tidak ada data untuk hari ini'),
+          ),
+        );
+      }
     } catch (e) {
-      // Handle error, e.g., show a SnackBar or log the error
+      // Handle error, e.g., show a SnackBar atau log the error
       print('Error fetching today data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Terjadi kesalahan saat mengambil data: $e'),
+        ),
+      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -64,13 +78,18 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
   }
 
   void _showDataBottomSheet(DateTime date) async {
+    setState(() {
+      _selectedDate = date;
+    });
     await _fetchTodayData(date);
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return _buildBottomSheetContent();
-      },
-    );
+    if (_todayData.isNotEmpty) {
+      showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return _buildBottomSheetContent();
+        },
+      );
+    }
   }
 
   Widget _buildBottomSheetContent() {
@@ -86,10 +105,10 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
             : Column(
                 children: [
                   SizedBox(height: 20),
-                  // SectionHeader(
-                  //   text: 'Rata-rata Mingguan',
-                  //   padding: padding8,
-                  // ),
+                  SectionHeader(
+                    text: 'Hari: ${_selectedDate != null ? formatDateInIndonesian(_selectedDate!): ''}',
+                    padding: const EdgeInsets.all(8.0),
+                  ),
                   ValueContainer(
                     label: 'pH',
                     value: _todayData[0].phAverage,
@@ -121,7 +140,7 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
                   Text('Jam'),
                   SizedBox(height: 15),
                 ],
-              ),
+              )
       ]),
     ));
   }
@@ -227,9 +246,26 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
                 final date = _dailyDates[index];
                 final formattedDate = formatDateInIndonesian(date);
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 5.0),
                   child: ElevatedButton(
-                    child: Text(formattedDate),
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      padding: MaterialStateProperty.all(
+                        EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      ),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        Colors.blueGrey,
+                      ),
+                    ),
+                    child: Text(
+                      formattedDate,
+                      style: TextStyle(color: Colors.white),
+                    ),
                     onPressed: () {
                       _showDataBottomSheet(date);
                     },
