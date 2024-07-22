@@ -16,6 +16,8 @@ class _TodayScreenState extends State<TodayScreen> {
   final DataService _dataService = DataService();
   final NotificationService _notificationService = NotificationService();
 
+  // DateTime currentDate = DateTime.now();
+  DateTime currentDate = DateTime(2024,7,19);
   List<DataPoint> _todayData = [];
   List<String> _bottomTitles = [];
   bool _isLoading = false;
@@ -27,7 +29,7 @@ class _TodayScreenState extends State<TodayScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchTodayData();
+    _fetchTodayData(currentDate);
     _notificationService.initialize();
 
     _subscription = _dataService.listenToTodayData().listen((data) {
@@ -36,7 +38,7 @@ class _TodayScreenState extends State<TodayScreen> {
         doAvg = data['DO'] ?? 0;
       });
 
-      // Periksa dan tampilkan notifikasi jika nilai mendekati 0
+      // Periksa dan tampilkan notifikasi jika nilai mendekati ThresholdValue
       _notificationService.checkAndNotify(phAvg, doAvg);
     });
   }
@@ -47,12 +49,12 @@ class _TodayScreenState extends State<TodayScreen> {
     super.dispose();
   }
 
-  Future<void> _fetchTodayData() async {
+  Future<void> _fetchTodayData(DateTime currentDate) async {
     setState(() {
       _isLoading = true;
     });
 
-    final data = await _dataService.getTodayData();
+    final data = await _dataService.getTodayData(currentDate);
     setState(() {
       _todayData = data;
       _bottomTitles = _todayData.map((dataPoint) => dataPoint.titleToday).toList();
@@ -63,7 +65,7 @@ class _TodayScreenState extends State<TodayScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<DataPoint>>(
-        future: _dataService.getTodayData(),
+        future: _dataService.getTodayData(currentDate),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(

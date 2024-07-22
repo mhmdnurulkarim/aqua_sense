@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../widgets/chart.dart';
 import '../core/data_service.dart';
@@ -12,50 +13,94 @@ class WeeklyScreen extends StatefulWidget {
 class _WeeklyScreenState extends State<WeeklyScreen> {
   final DataService _dataService = DataService();
 
-  List<DataPoint> _weeklyData = [];
-  List<DataPoint>? _dailyData;
+  List<DataPoint> _todayData = [];
   List<String> _bottomTitles = [];
-  DataPoint? _selectedWeeklyData;
   bool _isLoading = false;
+
+  bool _isLoadingDailyButtons = false;
+  List<DateTime> _dailyDates = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchWeeklyData();
   }
 
-  Future<void> _fetchWeeklyData() async {
-    final data = await _dataService.getWeeklyData();
-    setState(() {
-      _weeklyData = data;
-    });
-  }
-
-  Future<void> _fetchDailyData(int weekNumber) async {
+  Future<void> _fetchTodayData(DateTime currentDate) async {
     setState(() {
       _isLoading = true;
     });
 
-    final data = await _dataService.getDailyData(weekNumber);
+    try {
+      final data = await _dataService.getTodayData(currentDate);
+      setState(() {
+        _todayData = data;
+        _bottomTitles =
+            _todayData.map((dataPoint) => dataPoint.titleToday).toList();
+      });
+    } catch (e) {
+      // Handle error, e.g., show a SnackBar or log the error
+      print('Error fetching today data: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _showDailyButtons(DateTime startDate) async {
     setState(() {
-      _dailyData = data;
-      _bottomTitles =
-          List.generate(_dailyData!.length, (index) => (index + 1).toString());
-      _isLoading = false;
+      _isLoadingDailyButtons = true;
+    });
+
+    List<DateTime> dates = [];
+    for (int i = 0; i < 7; i++) {
+      dates.add(startDate.add(Duration(days: i)));
+    }
+
+    setState(() {
+      _dailyDates = dates;
+      _isLoadingDailyButtons = false;
     });
   }
 
-  void _showData(int weekNumber) async {
-    if (weekNumber < _weeklyData.length) {
-      setState(() {
-        _selectedWeeklyData = _weeklyData[weekNumber];
-      });
-      await _fetchDailyData(weekNumber + 1);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No data available for Week ${weekNumber + 1}')),
-      );
-    }
+  void _showDataBottomSheet(DateTime date) async {
+    await _fetchTodayData(date);
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return _buildBottomSheetContent();
+      },
+    );
+  }
+
+  Widget _buildBottomSheetContent() {
+    return SingleChildScrollView(
+      child: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                SectionHeader(
+                  text: 'Rata-rata Harian',
+                  padding: padding8,
+                ),
+                if (_todayData != null)
+                  CustomLineChart(
+                    dataPoint: _todayData,
+                    bottomTitles: _bottomTitles,
+                  ),
+                ValueContainer(
+                  label: 'pH',
+                  value: _todayData[0].phAverage,
+                ),
+                SizedBox(height: 10),
+                ValueContainer(
+                  label: 'DO',
+                  value: _todayData[0].doAverage,
+                ),
+                SizedBox(height: 15),
+              ],
+            ),
+    );
   }
 
   @override
@@ -66,7 +111,9 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
         body: Column(
           children: [
             _buildWeeklyButtons(),
-            if (_selectedWeeklyData != null) _buildWeeklyDetails(),
+            _isLoadingDailyButtons
+                ? Center(child: CircularProgressIndicator())
+                : _buildDailyButtons(),
           ],
         ),
       ),
@@ -95,34 +142,34 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (int i = 0; i < 4; i++)
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: ElevatedButton(
-                            child: Text(
-                              'Minggu ${i + 1}',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              padding: MaterialStateProperty.all(
-                                EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 5),
-                              ),
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                Colors.blueGrey,
-                              ),
-                            ),
-                            onPressed: () => _showData(i),
+                    children: List.generate(4, (i) {
+                      final startDate =
+                          DateTime.now().subtract(Duration(days: (3 - i) * 7));
+                      return Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: ElevatedButton(
+                          child: Text(
+                            'Minggu ${i + 1}',
+                            style: TextStyle(color: Colors.white),
                           ),
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            padding: MaterialStateProperty.all(
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            ),
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.blueGrey,
+                            ),
+                          ),
+                          onPressed: () => _showDailyButtons(startDate),
                         ),
-                    ],
+                      );
+                    }),
                   ),
                 ),
               ),
@@ -147,61 +194,85 @@ class _WeeklyScreenState extends State<WeeklyScreen> {
     );
   }
 
-  Widget _buildWeeklyDetails() {
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16),
-          child: Column(
-            children: [
-              _isLoading
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : Column(
-                      children: [
-                        SectionHeader(
-                          text: 'Rata-rata Mingguan',
-                          padding: padding8,
-                        ),
-                        ValueContainer(
-                          label: 'pH',
-                          value: _selectedWeeklyData!.phAverage,
-                        ),
-                        SizedBox(height: 10),
-                        ValueContainer(
-                          label: 'DO',
-                          value: _selectedWeeklyData!.doAverage,
-                        ),
-                        SizedBox(height: 15),
-                        SectionHeader(
-                            text: 'Rata-rata Harian', padding: padding8),
-                        Padding(
-                          padding: padding10,
-                          child: Row(
-                            children: [
-                              LegendItem(label: 'DO', color: Colors.amber),
-                              SizedBox(width: 10),
-                              LegendItem(
-                                  label: 'pH',
-                                  color: Colors.indigo,
-                                  textStyle: textStyleBoldWhite),
-                            ],
-                          ),
-                        ),
-                        if (_dailyData != null)
-                          CustomLineChart(
-                              dataPoint: _dailyData!,
-                              bottomTitles: _bottomTitles),
-                        Text('Hari perminggu'),
-                        SizedBox(height: 15),
-                      ],
-                    ),
-            ],
-          ),
-        ),
+  Widget _buildDailyButtons() {
+    return _dailyDates.isEmpty
+        ? Container()
+        : Expanded(
+      child: ListView.builder(
+        itemCount: _dailyDates.length,
+        itemBuilder: (context, index) {
+          final date = _dailyDates[index];
+          final formattedDate =
+          DateFormat('EEEE/dd-MM-yyyy').format(date);
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0),
+            child: ElevatedButton(
+              child: Text(formattedDate),
+              onPressed: () {
+                _showDataBottomSheet(date);
+              },
+            ),
+          );
+        },
       ),
     );
   }
 }
+
+// Widget _buildWeeklyDetails() {
+//   return Expanded(
+//     child: SingleChildScrollView(
+//       child: Padding(
+//         padding: const EdgeInsets.only(left: 16, right: 16),
+//         child: Column(
+//           children: [
+//             _isLoading
+//                 ? Padding(
+//                     padding: const EdgeInsets.only(top: 20),
+//                     child: Center(child: CircularProgressIndicator()),
+//                   )
+//                 : Column(
+//                     children: [
+//                       SectionHeader(
+//                         text: 'Rata-rata Mingguan',
+//                         padding: padding8,
+//                       ),
+//                       ValueContainer(
+//                         label: 'pH',
+//                         value: _selectedWeeklyData!.phAverage,
+//                       ),
+//                       SizedBox(height: 10),
+//                       ValueContainer(
+//                         label: 'DO',
+//                         value: _selectedWeeklyData!.doAverage,
+//                       ),
+//                       SizedBox(height: 15),
+//                       SectionHeader(
+//                           text: 'Rata-rata Harian', padding: padding8),
+//                       Padding(
+//                         padding: padding10,
+//                         child: Row(
+//                           children: [
+//                             LegendItem(label: 'DO', color: Colors.amber),
+//                             SizedBox(width: 10),
+//                             LegendItem(
+//                                 label: 'pH',
+//                                 color: Colors.indigo,
+//                                 textStyle: textStyleBoldWhite),
+//                           ],
+//                         ),
+//                       ),
+//                       if (_dailyData != null)
+//                         CustomLineChart(
+//                             dataPoint: _dailyData!,
+//                             bottomTitles: _bottomTitles),
+//                       Text('Hari perminggu'),
+//                       SizedBox(height: 15),
+//                     ],
+//                   ),
+//           ],
+//         ),
+//       ),
+//     ),
+//   );
+// }

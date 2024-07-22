@@ -38,8 +38,8 @@ class DataService {
   StreamSubscription<DocumentSnapshot>? _subscription;
 
   Stream<Map<String, dynamic>> listenToTodayData() {
-    DateTime currentDate = DateTime.now();
-    // DateTime currentDate = DateTime(2024, 7, 19);
+    // DateTime currentDate = DateTime.now();
+    DateTime currentDate = DateTime(2024, 7, 19);
     var currentDateFormatted =
         "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
 
@@ -61,9 +61,9 @@ class DataService {
   }
 
   //TodayScreen
-  Future<List<DataPoint>> getTodayData() async {
+  Future<List<DataPoint>> getTodayData(DateTime currentDate) async {
     // DateTime currentDate = DateTime.now();
-    DateTime currentDate = DateTime(2024, 7, 21);
+    // DateTime currentDate = DateTime(2024, 7, 21);
     var currentDateFormatted =
         "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
     String dayOfWeek = getDayOfWeek(currentDate.weekday);
@@ -97,7 +97,7 @@ class DataService {
     return todayData;
   }
 
-  //Fetch Data Weekly & This Month
+  //Fetch Data for This Month
   Future<DataPoint> fetchDailyData(DateTime currentDate) async {
     var currentDateFormatted =
         "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
@@ -124,7 +124,7 @@ class DataService {
     }
   }
 
-//WeeklyScreen
+  //Avg. Daily
   Future<List<DataPoint>> getDailyData(int weekNumber) async {
     List<DataPoint> dailyData = [];
     DateTime now = DateTime.now();
@@ -151,7 +151,7 @@ class DataService {
     return dailyData;
   }
 
-  //ThisMonthScreen
+  //Avg. Weekly
   Future<List<DataPoint>> getWeeklyData() async {
     List<DataPoint> weeklyData = [];
     DateTime now = DateTime.now();

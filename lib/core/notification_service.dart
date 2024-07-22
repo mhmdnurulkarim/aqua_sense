@@ -81,22 +81,24 @@ class NotificationService {
   }
 
   void checkAndNotify(double? pHValue, double? doValue) {
-    if (pHValue != null && pHValue < pHThreshold) {
-      _showNotification(
-        title: 'Peringatan: $pHValue',
-        body: 'Segera evakuasi ikan!, air danau dalam keadaan asam.',
-      );
-    }
-    else if (doValue != null && doValue < doThreshold) {
-      _showNotification(
-        title: 'Peringatan: $doValue',
-        body: 'Segera evakuasi ikan!, kadar oksigen mengalami penurunan.',
-      );
+    if (pHValue != null && pHValue == 0 && doValue != null && doValue == 0) {
     }
     else if (pHValue != null && pHValue < pHThreshold && doValue != null && doValue < doThreshold) {
       _showNotification(
         title: 'Karamba dalam bahaya!',
         body: 'Segera evakuasi ikan!, terjadi tubo balerang.',
+      );
+    }
+    else if (pHValue != null && pHValue < pHThreshold) {
+      _showNotification(
+        title: 'Peringatan: Keasaman air $pHValue',
+        body: 'Segera evakuasi ikan!, air danau dalam keadaan asam.',
+      );
+    }
+    else if (doValue != null && doValue < doThreshold) {
+      _showNotification(
+        title: 'Peringatan: Kadar Oksigen $doValue',
+        body: 'Segera evakuasi ikan!, kadar oksigen mengalami penurunan.',
       );
     }
   }
