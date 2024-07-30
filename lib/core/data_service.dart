@@ -38,8 +38,8 @@ class DataService {
   StreamSubscription<DocumentSnapshot>? _subscription;
 
   Stream<Map<String, dynamic>> listenToTodayData() {
-    // DateTime currentDate = DateTime.now();
-    DateTime currentDate = DateTime(2024, 7, 19);
+    DateTime currentDate = DateTime.now();
+    // DateTime currentDate = DateTime(2024, 7, 19);
     var currentDateFormatted =
         "${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}";
 
